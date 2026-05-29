@@ -29,7 +29,21 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <ClerkProvider>{children}</ClerkProvider>
+        <ClerkProvider
+          appearance={{
+            variables: {
+              colorPrimary: "#06b6d4",
+              colorBackground: "#0f172a",
+              colorInputBackground: "#1e293b",
+              colorInputText: "#e2e8f0",
+              colorText: "#e2e8f0",
+              colorTextSecondary: "#94a3b8",
+              borderRadius: "0.75rem",
+            },
+          }}
+        >
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
