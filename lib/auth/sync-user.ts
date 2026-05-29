@@ -29,6 +29,12 @@ function getUsername(email: string) {
   return email.split("@")[0];
 }
 
+function getProfileImage(
+  clerkUser: NonNullable<Awaited<ReturnType<typeof currentUser>>>,
+) {
+  return clerkUser.imageUrl || null;
+}
+
 export async function syncUser() {
   const clerkUser = await currentUser();
 
@@ -43,19 +49,27 @@ export async function syncUser() {
   }
 
   const username = getUsername(email);
+  const name = getDisplayName(clerkUser);
+  const image = getProfileImage(clerkUser);
 
   const existingUser = await db.query.users.findFirst({
     where: eq(users.clerkId, clerkUser.id),
   });
 
   if (existingUser) {
-    if (existingUser.username === username) {
+    const shouldUpdate =
+      existingUser.email !== email ||
+      existingUser.username !== username ||
+      existingUser.name !== name ||
+      existingUser.image !== image;
+
+    if (!shouldUpdate) {
       return existingUser;
     }
 
     const [updatedUser] = await db
       .update(users)
-      .set({ username })
+      .set({ email, username, name, image })
       .where(eq(users.id, existingUser.id))
       .returning();
 
@@ -67,9 +81,9 @@ export async function syncUser() {
     .values({
       clerkId: clerkUser.id,
       email,
-      name: getDisplayName(clerkUser),
+      name,
       username,
-      image: clerkUser.imageUrl,
+      image,
     })
     .onConflictDoNothing({
       target: users.clerkId,
