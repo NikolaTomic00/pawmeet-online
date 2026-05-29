@@ -6,7 +6,7 @@ import { MobileNavbar } from "./mobile-navbar";
 
 const navItems = [
   {
-    label: "Home",
+    label: "Feed",
     icon: Home,
     href: "/",
   },

@@ -62,13 +62,13 @@ export function LeftSidebar({ user, stats }: LeftSidebarProps) {
           </CardHeader>
 
           <CardContent>
-            <div className="rounded-xl bg-gradient-to-bl from-slate-800/40 to-transparent">
+            <div className="rounded-xl">
               <Image
                 src="/signup.png"
                 alt="People using mobile devices"
                 width={420}
                 height={320}
-                className="h-auto w-full object-contain"
+                className="h-auto w-full object-contain py-10"
               />
               <div className="mt-6 text-center">
                 <h3 className="text-xl font-medium text-cyan-400">
