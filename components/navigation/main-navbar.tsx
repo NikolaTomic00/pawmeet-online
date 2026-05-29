@@ -1,6 +1,7 @@
-import { Bell, Home, PawPrint, UserRound } from "lucide-react";
 import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { Bell, Home, PawPrint, UserRound } from "lucide-react";
 import Link from "next/link";
+
 import { MobileNavbar } from "./mobile-navbar";
 
 const navItems = [

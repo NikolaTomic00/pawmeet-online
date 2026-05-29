@@ -25,14 +25,8 @@ function getDisplayName(
   return fullName || clerkUser.username || "PawMeet user";
 }
 
-function getUsername(
-  clerkUser: NonNullable<Awaited<ReturnType<typeof currentUser>>>,
-  email: string,
-) {
-  const emailPrefix = email.split("@")[0];
-  const clerkSuffix = clerkUser.id.slice(-8);
-
-  return clerkUser.username || `${emailPrefix}_${clerkSuffix}`;
+function getUsername(email: string) {
+  return email.split("@")[0];
 }
 
 export async function syncUser() {
@@ -42,18 +36,30 @@ export async function syncUser() {
     return null;
   }
 
+  const email = getPrimaryEmail(clerkUser);
+
+  if (!email) {
+    throw new Error("Cannot sync Clerk user without an email address");
+  }
+
+  const username = getUsername(email);
+
   const existingUser = await db.query.users.findFirst({
     where: eq(users.clerkId, clerkUser.id),
   });
 
   if (existingUser) {
-    return existingUser;
-  }
+    if (existingUser.username === username) {
+      return existingUser;
+    }
 
-  const email = getPrimaryEmail(clerkUser);
+    const [updatedUser] = await db
+      .update(users)
+      .set({ username })
+      .where(eq(users.id, existingUser.id))
+      .returning();
 
-  if (!email) {
-    throw new Error("Cannot sync Clerk user without an email address");
+    return updatedUser ?? existingUser;
   }
 
   const [createdUser] = await db //Drizzle .returning() returns array
@@ -62,7 +68,7 @@ export async function syncUser() {
       clerkId: clerkUser.id,
       email,
       name: getDisplayName(clerkUser),
-      username: getUsername(clerkUser, email),
+      username,
       image: clerkUser.imageUrl,
     })
     .onConflictDoNothing({
@@ -74,7 +80,9 @@ export async function syncUser() {
     return createdUser;
   }
 
-  return db.query.users.findFirst({
+  const syncedUser = await db.query.users.findFirst({
     where: eq(users.clerkId, clerkUser.id),
   });
+
+  return syncedUser ?? null;
 }
