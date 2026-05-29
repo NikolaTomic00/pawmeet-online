@@ -53,7 +53,7 @@ export function CreatePost({ user }: CreatePostProps) {
   return (
     <Card>
       <CardContent className="space-y-4 p-4 sm:p-5">
-        <div className="flex gap-3">
+        <div className="flex gap-3 py-8 sm:py-0">
           <Avatar className="size-11">
             {user ? (
               <>

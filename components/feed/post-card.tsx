@@ -32,7 +32,7 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <Card>
       <CardContent className="space-y-4 p-4 sm:p-5">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 py-8 sm:py-0">
           <Avatar className="size-11">
             <AvatarImage
               src={post.author.image ?? undefined}
