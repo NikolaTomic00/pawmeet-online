@@ -1,9 +1,9 @@
 import "server-only";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { posts } from "@/db/schema";
+import { comments, posts } from "@/db/schema";
 
 export async function createPost({
   authorId,
@@ -31,6 +31,17 @@ export async function getFeedPosts() {
     orderBy: desc(posts.createdAt),
     with: {
       author: true,
+      comments: {
+        orderBy: asc(comments.createdAt),
+        with: {
+          author: true,
+        },
+      },
+      likes: {
+        columns: {
+          userId: true,
+        },
+      },
     },
   });
 }

@@ -1,11 +1,11 @@
 "use server";
 
 import { currentUser } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { comments, likes, notifications, posts, users } from "@/db/schema";
 import { createPost, deletePost } from "@/lib/social/posts";
 
 type CreatePostState = {
@@ -14,6 +14,16 @@ type CreatePostState = {
 };
 
 type DeletePostState = {
+  error?: string;
+  success?: string;
+};
+
+type ToggleLikeState = {
+  error?: string;
+  liked?: boolean;
+};
+
+type CreateCommentState = {
   error?: string;
   success?: string;
 };
@@ -84,4 +94,133 @@ export async function deletePostAction(
   revalidatePath("/");
 
   return { success: "Post deleted." };
+}
+
+export async function toggleLikeAction(
+  postId: string,
+): Promise<ToggleLikeState> {
+  const clerkUser = await currentUser();
+
+  if (!clerkUser) {
+    return { error: "You need to be signed in to like posts." };
+  }
+
+  if (!postId) {
+    return { error: "Post id is missing." };
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.clerkId, clerkUser.id),
+  });
+
+  if (!user) {
+    return { error: "Your PawMeet profile is still being prepared." };
+  }
+
+  const post = await db.query.posts.findFirst({
+    columns: {
+      authorId: true,
+      id: true,
+    },
+    where: eq(posts.id, postId),
+  });
+
+  if (!post) {
+    return { error: "Post was not found." };
+  }
+
+  const existingLike = await db.query.likes.findFirst({
+    where: and(eq(likes.postId, postId), eq(likes.userId, user.id)),
+  });
+
+  if (existingLike) {
+    await db
+      .delete(likes)
+      .where(and(eq(likes.postId, postId), eq(likes.userId, user.id)));
+
+    revalidatePath("/");
+
+    return { liked: false };
+  }
+
+  const [createdLike] = await db
+    .insert(likes)
+    .values({ postId, userId: user.id })
+    .onConflictDoNothing({
+      target: [likes.postId, likes.userId],
+    })
+    .returning({ id: likes.id });
+
+  if (createdLike && post.authorId !== user.id) {
+    await db.insert(notifications).values({
+      creatorId: user.id,
+      postId,
+      receiverId: post.authorId,
+      type: "like",
+    });
+  }
+
+  revalidatePath("/");
+
+  return { liked: true };
+}
+
+export async function createCommentAction(
+  postId: string,
+  content: string,
+): Promise<CreateCommentState> {
+  const clerkUser = await currentUser();
+
+  if (!clerkUser) {
+    return { error: "You need to be signed in to comment." };
+  }
+
+  const trimmedContent = content.trim();
+
+  if (!postId) {
+    return { error: "Post id is missing." };
+  }
+
+  if (!trimmedContent) {
+    return { error: "Write a comment first." };
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.clerkId, clerkUser.id),
+  });
+
+  if (!user) {
+    return { error: "Your PawMeet profile is still being prepared." };
+  }
+
+  const post = await db.query.posts.findFirst({
+    columns: {
+      authorId: true,
+      id: true,
+    },
+    where: eq(posts.id, postId),
+  });
+
+  if (!post) {
+    return { error: "Post was not found." };
+  }
+
+  await db.insert(comments).values({
+    authorId: user.id,
+    content: trimmedContent,
+    postId,
+  });
+
+  if (post.authorId !== user.id) {
+    await db.insert(notifications).values({
+      creatorId: user.id,
+      postId,
+      receiverId: post.authorId,
+      type: "comment",
+    });
+  }
+
+  revalidatePath("/");
+
+  return { success: "Comment added." };
 }

@@ -32,6 +32,7 @@ export async function FeedPlaceholder({ user }: FeedPlaceholderProps) {
               posts.map((post) => (
                 <PostCard
                   canDelete={user?.id === post.authorId}
+                  currentUserId={user?.id ?? null}
                   key={post.id}
                   post={post}
                 />

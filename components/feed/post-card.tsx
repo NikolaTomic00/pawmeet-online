@@ -1,5 +1,4 @@
-import { MessageCircle, PawPrint } from "lucide-react";
-
+import { CommentSection } from "@/components/feed/comment-section";
 import { DeletePostButton } from "@/components/feed/delete-post-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +8,7 @@ type PostWithAuthor = Awaited<ReturnType<typeof getFeedPosts>>[number];
 
 type PostCardProps = {
   canDelete?: boolean;
+  currentUserId?: string | null;
   post: PostWithAuthor;
 };
 
@@ -21,16 +21,24 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function formatPostDate(date: Date) {
+function formatPostDate(date: Date | string) {
   return new Intl.DateTimeFormat("en", {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     month: "short",
-  }).format(date);
+  }).format(new Date(date));
 }
 
-export function PostCard({ canDelete = false, post }: PostCardProps) {
+export function PostCard({
+  canDelete = false,
+  currentUserId = null,
+  post,
+}: PostCardProps) {
+  const isLikedByCurrentUser = Boolean(
+    currentUserId && post.likes.some((like) => like.userId === currentUserId),
+  );
+
   return (
     <Card>
       <CardContent className="space-y-4 p-4 sm:p-5">
@@ -48,7 +56,7 @@ export function PostCard({ canDelete = false, post }: PostCardProps) {
               {post.author.name}
             </p>
             <p className="truncate text-xs text-slate-500">
-              @{post.author.username} · {formatPostDate(post.createdAt)}
+              @{post.author.username} &middot; {formatPostDate(post.createdAt)}
             </p>
           </div>
 
@@ -72,15 +80,14 @@ export function PostCard({ canDelete = false, post }: PostCardProps) {
           </div>
         ) : null}
 
-        <div className="flex items-center gap-4 border-t border-slate-700/60 pt-3 text-sm text-slate-400">
-          <span className="inline-flex items-center gap-2">
-            <PawPrint className="size-4 text-cyan-300" />
-            0
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <MessageCircle className="size-4 text-cyan-300" />
-            0
-          </span>
+        <div className="border-t border-slate-700/60 pt-3">
+          <CommentSection
+            comments={post.comments}
+            initialIsLiked={isLikedByCurrentUser}
+            initialLikeCount={post.likes.length}
+            isSignedIn={Boolean(currentUserId)}
+            postId={post.id}
+          />
         </div>
       </CardContent>
     </Card>
