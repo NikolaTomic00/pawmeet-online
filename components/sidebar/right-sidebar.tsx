@@ -1,5 +1,6 @@
 import { eq, ne } from "drizzle-orm";
 
+import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/db";
@@ -69,9 +70,11 @@ export async function RightSidebar({ currentUserId }: RightSidebarProps) {
                     <p className="truncate text-sm font-medium text-slate-200">
                       {user.name}
                     </p>
-                    <p className="truncate text-xs text-slate-500">
-                      @{user.username}
-                    </p>
+                    <DogNameLine
+                      className="text-xs text-slate-500"
+                      dogName={user.dogName}
+                      iconClassName="size-3.5"
+                    />
                   </div>
                 </div>
 

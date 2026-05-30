@@ -1,7 +1,8 @@
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
-import { MapPin, PawPrint } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Image from "next/image";
 
+import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -114,7 +115,12 @@ export function LeftSidebar({ user, stats }: LeftSidebarProps) {
 
           <div>
             <CardTitle className="text-xl">{user.name}</CardTitle>
-            <CardDescription>@{user.username}</CardDescription>
+            <CardDescription>
+              <DogNameLine
+                className="justify-center text-sm"
+                dogName={user.dogName}
+              />
+            </CardDescription>
           </div>
         </CardHeader>
 

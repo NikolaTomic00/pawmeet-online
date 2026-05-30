@@ -1,5 +1,6 @@
 import { Bell, Heart, MessageCircle, UserPlus } from "lucide-react";
 
+import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BorderAnimatedContainer } from "@/components/ui/border-animated-container";
 import {
@@ -59,9 +60,11 @@ function PostPreview({
   return (
     <div className="mt-3 rounded-lg border border-slate-700/60 bg-slate-900/40 p-3">
       <div className="flex items-center gap-2 text-xs text-slate-500">
-        <span className="font-medium text-slate-300">
-          @{notification.post.author.username}
-        </span>
+        <DogNameLine
+          className="font-medium text-slate-300"
+          dogName={notification.post.author.dogName}
+          iconClassName="size-3.5"
+        />
         <span>{formatNotificationDate(notification.post.createdAt)}</span>
       </div>
 
@@ -113,9 +116,11 @@ function NotificationItem({
             <p className="text-sm font-semibold text-slate-100">
               {notification.creator.name}
             </p>
-            <span className="text-xs text-slate-500">
-              @{notification.creator.username}
-            </span>
+            <DogNameLine
+              className="text-xs text-slate-500"
+              dogName={notification.creator.dogName}
+              iconClassName="size-3.5"
+            />
             {!notification.read ? (
               <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-medium text-rose-300">
                 new

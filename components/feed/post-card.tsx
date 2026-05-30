@@ -1,5 +1,6 @@
 import { CommentSection } from "@/components/feed/comment-section";
 import { DeletePostButton } from "@/components/feed/delete-post-button";
+import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import type { getFeedPosts } from "@/lib/social/posts";
@@ -55,9 +56,15 @@ export function PostCard({
             <p className="truncate text-sm font-semibold text-slate-100">
               {post.author.name}
             </p>
-            <p className="truncate text-xs text-slate-500">
-              @{post.author.username} &middot; {formatPostDate(post.createdAt)}
-            </p>
+            <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
+              <DogNameLine
+                className="min-w-0"
+                dogName={post.author.dogName}
+                iconClassName="size-3.5"
+              />
+              <span className="shrink-0">&middot;</span>
+              <span className="shrink-0">{formatPostDate(post.createdAt)}</span>
+            </div>
           </div>
 
           {canDelete ? <DeletePostButton postId={post.id} /> : null}

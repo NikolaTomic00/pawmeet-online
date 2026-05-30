@@ -5,11 +5,13 @@ import { useState, useTransition } from "react";
 import toast from "react-hot-toast";
 
 import { LikePostButton } from "@/components/feed/like-post-button";
+import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createCommentAction } from "@/lib/social/post-actions";
 
 type Comment = {
   author: {
+    dogName: string | null;
     image: string | null;
     name: string;
     username: string;
@@ -132,10 +134,17 @@ export function CommentSection({
                       <p className="text-sm font-semibold text-slate-100">
                         {comment.author.name}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        @{comment.author.username} &middot;{" "}
-                        {formatCommentDate(comment.createdAt)}
-                      </p>
+                      <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
+                        <DogNameLine
+                          className="min-w-0"
+                          dogName={comment.author.dogName}
+                          iconClassName="size-3.5"
+                        />
+                        <span className="shrink-0">&middot;</span>
+                        <span className="shrink-0">
+                          {formatCommentDate(comment.createdAt)}
+                        </span>
+                      </div>
                     </div>
                     <p className="whitespace-pre-wrap text-sm leading-6 text-slate-300">
                       {comment.content}

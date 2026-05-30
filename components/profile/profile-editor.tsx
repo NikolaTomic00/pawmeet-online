@@ -17,6 +17,8 @@ import {
 import type { User } from "@/db/schema";
 import { updateProfileAction } from "@/lib/social/profile-actions";
 
+import { DogNameLine } from "./dog-name-line";
+
 type ProfileEditorProps = {
   canEdit: boolean;
   profile: User;
@@ -103,7 +105,7 @@ export function ProfileEditor({ canEdit, profile }: ProfileEditorProps) {
                   {profile.name}
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  @{profile.username}
+                  <DogNameLine dogName={profile.dogName} />
                 </CardDescription>
               </div>
             </div>
