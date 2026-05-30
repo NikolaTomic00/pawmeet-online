@@ -32,6 +32,8 @@ export default async function ProfilePage({
     notFound();
   }
 
+  const profileStats = await getFollowStats(profile.id);
+
   return (
     <PawMeetShell>
       <ClerkProfileRefresh
@@ -56,6 +58,7 @@ export default async function ProfilePage({
           <ProfileEditor
             canEdit={currentUser?.id === profile.id}
             profile={profile}
+            stats={profileStats}
           />
           <RightSidebar currentUserId={currentUser?.id ?? null} />
         </div>

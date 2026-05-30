@@ -1,4 +1,6 @@
 import { eq, ne } from "drizzle-orm";
+import { UserRound } from "lucide-react";
+import Link from "next/link";
 
 import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -77,6 +79,14 @@ export async function RightSidebar({ currentUserId }: RightSidebarProps) {
                     />
                   </div>
                 </div>
+
+                <Link
+                  className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-slate-700/70 bg-slate-950/50 px-3 text-xs font-medium text-slate-300 transition-colors hover:border-cyan-400/70 hover:text-white"
+                  href={`/profile/${user.id}`}
+                >
+                  <UserRound className="size-4 text-cyan-300" />
+                  View profile
+                </Link>
 
                 <FollowUserButton
                   initialFollowing={followedUserIds.has(user.id)}

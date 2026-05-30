@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, MessageCircle, Send } from "lucide-react";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import toast from "react-hot-toast";
 
@@ -12,6 +13,7 @@ import { createCommentAction } from "@/lib/social/post-actions";
 type Comment = {
   author: {
     dogName: string | null;
+    id: string;
     image: string | null;
     name: string;
     username: string;
@@ -119,21 +121,26 @@ export function CommentSection({
             {comments.length > 0 ? (
               comments.map((comment) => (
                 <article className="flex gap-3" key={comment.id}>
-                  <Avatar className="size-9">
-                    <AvatarImage
-                      src={comment.author.image ?? undefined}
-                      alt={comment.author.name}
-                    />
-                    <AvatarFallback>
-                      {getInitials(comment.author.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <Link href={`/profile/${comment.author.id}`}>
+                    <Avatar className="size-9 transition-opacity hover:opacity-85">
+                      <AvatarImage
+                        src={comment.author.image ?? undefined}
+                        alt={comment.author.name}
+                      />
+                      <AvatarFallback>
+                        {getInitials(comment.author.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <p className="text-sm font-semibold text-slate-100">
+                      <Link
+                        className="text-sm font-semibold text-slate-100 transition-colors hover:text-cyan-200"
+                        href={`/profile/${comment.author.id}`}
+                      >
                         {comment.author.name}
-                      </p>
+                      </Link>
                       <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
                         <DogNameLine
                           className="min-w-0"

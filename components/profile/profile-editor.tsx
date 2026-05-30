@@ -1,6 +1,14 @@
 "use client";
 
-import { Loader2, MapPin, PawPrint, Save, UserRound } from "lucide-react";
+import { useClerk } from "@clerk/nextjs";
+import {
+  Camera,
+  Loader2,
+  MapPin,
+  PawPrint,
+  Save,
+  UserRound,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import toast from "react-hot-toast";
@@ -22,6 +30,10 @@ import { DogNameLine } from "./dog-name-line";
 type ProfileEditorProps = {
   canEdit: boolean;
   profile: User;
+  stats: {
+    followers: number;
+    following: number;
+  };
 };
 
 function getInitials(name: string) {
@@ -57,7 +69,8 @@ function ProfileDetail({
   );
 }
 
-export function ProfileEditor({ canEdit, profile }: ProfileEditorProps) {
+export function ProfileEditor({ canEdit, profile, stats }: ProfileEditorProps) {
+  const { openUserProfile } = useClerk();
   const router = useRouter();
   const [bio, setBio] = useState(profile.bio ?? "");
   const [breed, setBreed] = useState(profile.breed ?? "");
@@ -88,26 +101,46 @@ export function ProfileEditor({ canEdit, profile }: ProfileEditorProps) {
     });
   }
 
+  function handleEditProfilePicture() {
+    openUserProfile();
+  }
+
   return (
     <section className="min-w-0">
       <BorderAnimatedContainer>
         <Card className="w-full border-0 bg-slate-950/40 shadow-none backdrop-blur-md">
           <CardHeader>
-            <div className="flex flex-wrap items-center gap-4">
-              <Avatar className="size-16">
-                <AvatarImage src={profile.image ?? undefined} alt={profile.name} />
-                <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
-              </Avatar>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex min-w-0 items-center gap-4">
+                <Avatar className="size-16 shrink-0">
+                  <AvatarImage
+                    src={profile.image ?? undefined}
+                    alt={profile.name}
+                  />
+                  <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
+                </Avatar>
 
-              <div className="min-w-0">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <UserRound className="size-5 text-cyan-300" />
-                  {profile.name}
-                </CardTitle>
-                <CardDescription className="mt-1">
-                  <DogNameLine dogName={profile.dogName} />
-                </CardDescription>
+                <div className="min-w-0">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <UserRound className="size-5 shrink-0 text-cyan-300" />
+                    <span className="truncate">{profile.name}</span>
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    <DogNameLine dogName={profile.dogName} />
+                  </CardDescription>
+                </div>
               </div>
+
+              {canEdit ? (
+                <button
+                  className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-slate-700/70 bg-slate-900/60 px-3 text-sm font-medium text-slate-200 transition-colors hover:border-cyan-400/70 hover:text-white"
+                  onClick={handleEditProfilePicture}
+                  type="button"
+                >
+                  <Camera className="size-4 text-cyan-300" />
+                  Edit profile
+                </button>
+              ) : null}
             </div>
           </CardHeader>
 
@@ -190,6 +223,21 @@ export function ProfileEditor({ canEdit, profile }: ProfileEditorProps) {
               </>
             ) : (
               <>
+                <div className="grid grid-cols-2 gap-3 text-center">
+                  <div className="rounded-lg border border-slate-700/60 bg-slate-900/40 p-3">
+                    <p className="text-lg font-semibold text-slate-100">
+                      {stats.followers}
+                    </p>
+                    <p className="text-xs text-slate-400">Followers</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-700/60 bg-slate-900/40 p-3">
+                    <p className="text-lg font-semibold text-slate-100">
+                      {stats.following}
+                    </p>
+                    <p className="text-xs text-slate-400">Following</p>
+                  </div>
+                </div>
+
                 {profile.bio ? (
                   <p className="whitespace-pre-wrap text-sm leading-6 text-slate-300">
                     {profile.bio}

@@ -4,6 +4,7 @@ import { DogNameLine } from "@/components/profile/dog-name-line";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import type { getFeedPosts } from "@/lib/social/posts";
+import Link from "next/link";
 
 type PostWithAuthor = Awaited<ReturnType<typeof getFeedPosts>>[number];
 
@@ -44,18 +45,23 @@ export function PostCard({
     <Card>
       <CardContent className="space-y-4 p-4 sm:p-5">
         <div className="flex items-center gap-3 py-8 sm:py-0">
-          <Avatar className="size-11">
-            <AvatarImage
-              src={post.author.image ?? undefined}
-              alt={post.author.name}
-            />
-            <AvatarFallback>{getInitials(post.author.name)}</AvatarFallback>
-          </Avatar>
+          <Link href={`/profile/${post.author.id}`}>
+            <Avatar className="size-11 transition-opacity hover:opacity-85">
+              <AvatarImage
+                src={post.author.image ?? undefined}
+                alt={post.author.name}
+              />
+              <AvatarFallback>{getInitials(post.author.name)}</AvatarFallback>
+            </Avatar>
+          </Link>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-100">
+            <Link
+              className="block truncate text-sm font-semibold text-slate-100 transition-colors hover:text-cyan-200"
+              href={`/profile/${post.author.id}`}
+            >
               {post.author.name}
-            </p>
+            </Link>
             <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
               <DogNameLine
                 className="min-w-0"
