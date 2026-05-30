@@ -112,7 +112,7 @@ export function CommentSection({
       </div>
 
       {isOpen ? (
-        <div className="space-y-3 rounded-lg border border-slate-700/70 bg-slate-950/40 p-3">
+        <div className="space-y-3">
           <div className="space-y-3">
             {comments.length > 0 ? (
               comments.map((comment) => (
