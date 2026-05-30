@@ -1,6 +1,6 @@
 import "server-only";
 
-import { desc } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { posts } from "@/db/schema";
@@ -33,4 +33,19 @@ export async function getFeedPosts() {
       author: true,
     },
   });
+}
+
+export async function deletePost({
+  authorId,
+  postId,
+}: {
+  authorId: string;
+  postId: string;
+}) {
+  const [deletedPost] = await db
+    .delete(posts)
+    .where(and(eq(posts.id, postId), eq(posts.authorId, authorId)))
+    .returning({ id: posts.id });
+
+  return deletedPost ?? null;
 }

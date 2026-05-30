@@ -1,5 +1,6 @@
 import { MessageCircle, PawPrint } from "lucide-react";
 
+import { DeletePostButton } from "@/components/feed/delete-post-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import type { getFeedPosts } from "@/lib/social/posts";
@@ -7,6 +8,7 @@ import type { getFeedPosts } from "@/lib/social/posts";
 type PostWithAuthor = Awaited<ReturnType<typeof getFeedPosts>>[number];
 
 type PostCardProps = {
+  canDelete?: boolean;
   post: PostWithAuthor;
 };
 
@@ -28,7 +30,7 @@ function formatPostDate(date: Date) {
   }).format(date);
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ canDelete = false, post }: PostCardProps) {
   return (
     <Card>
       <CardContent className="space-y-4 p-4 sm:p-5">
@@ -49,6 +51,8 @@ export function PostCard({ post }: PostCardProps) {
               @{post.author.username} · {formatPostDate(post.createdAt)}
             </p>
           </div>
+
+          {canDelete ? <DeletePostButton postId={post.id} /> : null}
         </div>
 
         {post.content ? (

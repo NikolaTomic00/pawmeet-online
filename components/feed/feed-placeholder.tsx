@@ -29,7 +29,13 @@ export async function FeedPlaceholder({ user }: FeedPlaceholderProps) {
             <CreatePost user={user} />
 
             {posts.length > 0 ? (
-              posts.map((post) => <PostCard key={post.id} post={post} />)
+              posts.map((post) => (
+                <PostCard
+                  canDelete={user?.id === post.authorId}
+                  key={post.id}
+                  post={post}
+                />
+              ))
             ) : (
               <div className="rounded-lg border border-dashed border-slate-700 bg-slate-900/30 p-5 text-sm text-slate-500">
                 No posts yet.
