@@ -23,7 +23,7 @@ const mobileNavItems = [
   {
     label: "Notification",
     icon: Bell,
-    href: "#",
+    href: "/notifications",
   },
   {
     label: "Profile",
@@ -35,7 +35,13 @@ const mobileNavItems = [
 const mobileLinkClass =
   "flex min-h-12 w-full items-center gap-3 rounded-lg border border-slate-700/70 bg-slate-900/60 px-4 text-base font-medium text-slate-200 transition-colors hover:border-cyan-400/70 hover:text-white";
 
-export function MobileNavbar() {
+type MobileNavbarProps = {
+  unreadCount?: number;
+};
+
+export function MobileNavbar({ unreadCount = 0 }: MobileNavbarProps) {
+  const hasUnreadNotifications = unreadCount > 0;
+
   return (
     <nav className="flex w-full items-center justify-between rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md lg:hidden">
       <Link className="flex items-center gap-3" href="/">
@@ -70,13 +76,23 @@ export function MobileNavbar() {
           <div className="mt-6 flex flex-1 flex-col gap-3">
             {mobileNavItems.map((item) => {
               const Icon = item.icon;
+              const isNotification = item.href === "/notifications";
+              const iconClassName =
+                isNotification && hasUnreadNotifications
+                  ? "size-5 text-rose-400"
+                  : "size-5 text-cyan-300";
 
-              if (item.href === "/") {
+              if (item.href === "/" || item.href === "/notifications") {
                 return (
                   <SheetClose asChild key={item.label}>
                     <Link className={mobileLinkClass} href={item.href}>
-                      <Icon className="size-5 text-cyan-300" />
+                      <Icon className={iconClassName} />
                       {item.label}
+                      {isNotification && hasUnreadNotifications ? (
+                        <span className="ml-auto rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-semibold text-rose-300">
+                          {unreadCount} unread
+                        </span>
+                      ) : null}
                     </Link>
                   </SheetClose>
                 );
@@ -85,7 +101,7 @@ export function MobileNavbar() {
               return (
                 <SheetClose asChild key={item.label}>
                   <a className={mobileLinkClass} href={item.href}>
-                    <Icon className="size-5 text-cyan-300" />
+                    <Icon className={iconClassName} />
                     {item.label}
                   </a>
                 </SheetClose>

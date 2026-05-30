@@ -1,9 +1,11 @@
-import { ne } from "drizzle-orm";
+import { eq, ne } from "drizzle-orm";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { follows, users } from "@/db/schema";
+
+import { FollowUserButton } from "./follow-user-button";
 
 type RightSidebarProps = {
   currentUserId: string | null;
@@ -27,6 +29,18 @@ export async function RightSidebar({ currentUserId }: RightSidebarProps) {
     : await db.query.users.findMany({
         limit: 4,
       });
+  const followedUserIds = currentUserId
+    ? new Set(
+        (
+          await db.query.follows.findMany({
+            columns: {
+              followingId: true,
+            },
+            where: eq(follows.followerId, currentUserId),
+          })
+        ).map((follow) => follow.followingId),
+      )
+    : new Set<string>();
 
   return (
     <aside className="hidden h-full xl:block">
@@ -38,20 +52,34 @@ export async function RightSidebar({ currentUserId }: RightSidebarProps) {
         <CardContent className="space-y-4">
           {suggestions.length > 0 ? (
             suggestions.map((user) => (
-              <div className="flex items-center gap-3" key={user.id}>
-                <Avatar>
-                  <AvatarImage src={user.image ?? undefined} alt={user.name} />
-                  <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                </Avatar>
+              <div
+                className="space-y-3 rounded-lg border border-slate-700/60 bg-slate-900/30 p-3"
+                key={user.id}
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar>
+                    <AvatarImage
+                      src={user.image ?? undefined}
+                      alt={user.name}
+                    />
+                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  </Avatar>
 
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-200">
-                    {user.name}
-                  </p>
-                  <p className="truncate text-xs text-slate-500">
-                    @{user.username}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-slate-200">
+                      {user.name}
+                    </p>
+                    <p className="truncate text-xs text-slate-500">
+                      @{user.username}
+                    </p>
+                  </div>
                 </div>
+
+                <FollowUserButton
+                  initialFollowing={followedUserIds.has(user.id)}
+                  isSignedIn={Boolean(currentUserId)}
+                  userId={user.id}
+                />
               </div>
             ))
           ) : (

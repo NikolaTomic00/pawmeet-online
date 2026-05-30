@@ -139,6 +139,7 @@ export async function toggleLikeAction(
       .where(and(eq(likes.postId, postId), eq(likes.userId, user.id)));
 
     revalidatePath("/");
+    revalidatePath("/notifications");
 
     return { liked: false };
   }
@@ -161,6 +162,7 @@ export async function toggleLikeAction(
   }
 
   revalidatePath("/");
+  revalidatePath("/notifications");
 
   return { liked: true };
 }
@@ -221,6 +223,7 @@ export async function createCommentAction(
   }
 
   revalidatePath("/");
+  revalidatePath("/notifications");
 
   return { success: "Comment added." };
 }

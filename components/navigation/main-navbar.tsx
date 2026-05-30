@@ -13,7 +13,7 @@ const navItems = [
   {
     label: "Notification",
     icon: Bell,
-    href: "#",
+    href: "/notifications",
   },
   {
     label: "Profile",
@@ -22,10 +22,16 @@ const navItems = [
   },
 ];
 
-export function MainNavbar() {
+type MainNavbarProps = {
+  unreadCount?: number;
+};
+
+export function MainNavbar({ unreadCount = 0 }: MainNavbarProps) {
+  const hasUnreadNotifications = unreadCount > 0;
+
   return (
     <>
-      <MobileNavbar />
+      <MobileNavbar unreadCount={unreadCount} />
 
       <nav className="hidden w-full flex-col gap-4 rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md sm:px-6 lg:flex lg:flex-row lg:items-center lg:justify-between">
         <Link className="flex items-center gap-3" href="/">
@@ -40,19 +46,29 @@ export function MainNavbar() {
             const Icon = item.icon;
             const className =
               "flex items-center gap-2 rounded-lg border border-slate-700/70 bg-slate-900/60 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-cyan-400/70 hover:text-white";
+            const isNotification = item.href === "/notifications";
+            const iconClassName =
+              isNotification && hasUnreadNotifications
+                ? "size-4 text-rose-400"
+                : "size-4 text-cyan-300";
 
-            if (item.href === "/") {
+            if (item.href === "/" || item.href === "/notifications") {
               return (
                 <Link className={className} href={item.href} key={item.label}>
-                  <Icon className="size-4 text-cyan-300" />
+                  <Icon className={iconClassName} />
                   {item.label}
+                  {isNotification && hasUnreadNotifications ? (
+                    <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-semibold text-rose-300">
+                      {unreadCount} unread
+                    </span>
+                  ) : null}
                 </Link>
               );
             }
 
             return (
               <a className={className} href={item.href} key={item.label}>
-                <Icon className="size-4 text-cyan-300" />
+                <Icon className={iconClassName} />
                 {item.label}
               </a>
             );
