@@ -155,13 +155,6 @@ export function LeftSidebar({ user, stats }: LeftSidebarProps) {
             <ProfileDetail label="Dog name" value={user.dogName} />
             <ProfileDetail label="Breed" value={user.breed} />
           </div>
-
-          {user.dogName || user.breed ? (
-            <div className="flex items-center gap-2 rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-200">
-              <PawPrint className="size-4" />
-              Pet profile ready
-            </div>
-          ) : null}
         </CardContent>
       </Card>
     </aside>

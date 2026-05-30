@@ -14,7 +14,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const mobileNavItems = [
+function getMobileNavItems(currentUserId: string | null) {
+  return [
   {
     label: "Home",
     icon: Home,
@@ -28,19 +29,25 @@ const mobileNavItems = [
   {
     label: "Profile",
     icon: UserRound,
-    href: "#",
+    href: currentUserId ? `/profile/${currentUserId}` : "#",
   },
-];
+  ];
+}
 
 const mobileLinkClass =
   "flex min-h-12 w-full items-center gap-3 rounded-lg border border-slate-700/70 bg-slate-900/60 px-4 text-base font-medium text-slate-200 transition-colors hover:border-cyan-400/70 hover:text-white";
 
 type MobileNavbarProps = {
+  currentUserId?: string | null;
   unreadCount?: number;
 };
 
-export function MobileNavbar({ unreadCount = 0 }: MobileNavbarProps) {
+export function MobileNavbar({
+  currentUserId = null,
+  unreadCount = 0,
+}: MobileNavbarProps) {
   const hasUnreadNotifications = unreadCount > 0;
+  const mobileNavItems = getMobileNavItems(currentUserId);
 
   return (
     <nav className="flex w-full items-center justify-between rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md lg:hidden">
@@ -82,7 +89,7 @@ export function MobileNavbar({ unreadCount = 0 }: MobileNavbarProps) {
                   ? "size-5 text-rose-400"
                   : "size-5 text-cyan-300";
 
-              if (item.href === "/" || item.href === "/notifications") {
+              if (item.href !== "#") {
                 return (
                   <SheetClose asChild key={item.label}>
                     <Link className={mobileLinkClass} href={item.href}>

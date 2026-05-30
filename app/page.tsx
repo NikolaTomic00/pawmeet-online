@@ -32,7 +32,7 @@ export default async function Home() {
         }
       />
       <main className="min-h-[calc(100vh-2rem)] w-full px-2 sm:px-4">
-        <MainNavbar unreadCount={unreadCount} />
+        <MainNavbar currentUserId={user?.id ?? null} unreadCount={unreadCount} />
         <div className="mt-5 grid min-h-[calc(100vh-8rem)] w-full items-stretch gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
           <LeftSidebar user={user} stats={stats} />
           <FeedPlaceholder user={user} />

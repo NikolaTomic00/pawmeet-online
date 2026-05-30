@@ -4,7 +4,8 @@ import Link from "next/link";
 
 import { MobileNavbar } from "./mobile-navbar";
 
-const navItems = [
+function getNavItems(currentUserId: string | null) {
+  return [
   {
     label: "Feed",
     icon: Home,
@@ -18,20 +19,26 @@ const navItems = [
   {
     label: "Profile",
     icon: UserRound,
-    href: "#",
+    href: currentUserId ? `/profile/${currentUserId}` : "#",
   },
-];
+  ];
+}
 
 type MainNavbarProps = {
+  currentUserId?: string | null;
   unreadCount?: number;
 };
 
-export function MainNavbar({ unreadCount = 0 }: MainNavbarProps) {
+export function MainNavbar({
+  currentUserId = null,
+  unreadCount = 0,
+}: MainNavbarProps) {
   const hasUnreadNotifications = unreadCount > 0;
+  const navItems = getNavItems(currentUserId);
 
   return (
     <>
-      <MobileNavbar unreadCount={unreadCount} />
+      <MobileNavbar currentUserId={currentUserId} unreadCount={unreadCount} />
 
       <nav className="hidden w-full flex-col gap-4 rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md sm:px-6 lg:flex lg:flex-row lg:items-center lg:justify-between">
         <Link className="flex items-center gap-3" href="/">
@@ -52,7 +59,7 @@ export function MainNavbar({ unreadCount = 0 }: MainNavbarProps) {
                 ? "size-4 text-rose-400"
                 : "size-4 text-cyan-300";
 
-            if (item.href === "/" || item.href === "/notifications") {
+            if (item.href !== "#") {
               return (
                 <Link className={className} href={item.href} key={item.label}>
                   <Icon className={iconClassName} />
