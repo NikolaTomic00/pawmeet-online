@@ -1,5 +1,7 @@
 # PawMeet Social App
 
+https://pawmeet.vercel.app
+
 PawMeet is a full-stack social networking application built for pet owners and animal lovers. The app gives users a focused place to create a profile, share posts with images, interact through likes and comments, follow other users, receive notifications, and exchange direct messages.
 
 I built this project to practice and demonstrate production-oriented full-stack development with modern React, Next.js App Router, authentication, relational data modeling, server actions, media uploads, and responsive UI design.
