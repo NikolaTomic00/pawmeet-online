@@ -15,6 +15,13 @@
       "when": 1780221995419,
       "tag": "0001_amused_adam_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780223096408,
+      "tag": "0002_rich_multiple_man",
+      "breakpoints": true
     }
   ]
 }

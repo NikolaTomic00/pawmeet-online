@@ -163,6 +163,7 @@ export const messages = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     text: text("text"),
     image: text("image"),
+    read: boolean("read").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -170,6 +171,7 @@ export const messages = pgTable(
   (table) => [
     index("messages_sender_id_idx").on(table.senderId),
     index("messages_receiver_id_idx").on(table.receiverId),
+    index("messages_receiver_id_read_idx").on(table.receiverId, table.read),
     index("messages_pair_created_at_idx").on(
       table.senderId,
       table.receiverId,

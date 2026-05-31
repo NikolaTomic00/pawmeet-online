@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 
 import { ClerkProfileRefresh } from "@/components/auth/clerk-profile-refresh";
 import { ChatView } from "@/components/chat/chat-view";
+import { MessageInbox } from "@/components/chat/message-inbox";
 import { PawMeetShell } from "@/components/layout/pawmeet-shell";
 import { MainNavbar } from "@/components/navigation/main-navbar";
 import { LeftSidebar } from "@/components/sidebar/left-sidebar";
@@ -13,6 +14,9 @@ import { getFollowStats } from "@/lib/social/follows";
 import {
   getChatUserById,
   getConversationMessages,
+  getUnreadMessageCount,
+  getUnreadMessageThreads,
+  markConversationMessagesAsRead,
 } from "@/lib/social/messages";
 import { getUnreadNotificationCount } from "@/lib/social/notifications";
 
@@ -39,13 +43,25 @@ export default async function MessagesPage({
         where: eq(users.id, selectedUser.id),
       })
     : null;
-  const initialMessages =
-    user && selectedUserStillExists
-      ? await getConversationMessages({
-          currentUserId: user.id,
-          otherUserId: selectedUserStillExists.id,
-        })
-      : [];
+  if (user && selectedUserStillExists) {
+    await markConversationMessagesAsRead({
+      currentUserId: user.id,
+      otherUserId: selectedUserStillExists.id,
+    });
+  }
+
+  const [initialMessages, unreadMessageCount, unreadMessageThreads] = user
+    ? await Promise.all([
+        selectedUserStillExists
+          ? getConversationMessages({
+              currentUserId: user.id,
+              otherUserId: selectedUserStillExists.id,
+            })
+          : [],
+        getUnreadMessageCount(user.id),
+        getUnreadMessageThreads(user.id),
+      ])
+    : [[], 0, []];
 
   return (
     <PawMeetShell>
@@ -62,16 +78,28 @@ export default async function MessagesPage({
         }
       />
       <main className="min-h-[calc(100vh-2rem)] w-full px-2 sm:px-4">
-        <MainNavbar currentUserId={user?.id ?? null} unreadCount={unreadCount} />
+        <MainNavbar
+          currentUserId={user?.id ?? null}
+          unreadCount={unreadCount}
+          unreadMessageCount={unreadMessageCount}
+        />
         <div className="mt-5 grid min-h-[calc(100vh-8rem)] w-full items-stretch gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
           <LeftSidebar user={user} stats={stats} />
           <section className="min-w-0">
-            <ChatView
-              currentUserId={user?.id ?? null}
-              initialMessages={initialMessages}
-              key={selectedUser?.id ?? "no-conversation"}
-              selectedUser={selectedUserStillExists ? selectedUser : null}
-            />
+            {selectedUserStillExists ? (
+              <ChatView
+                currentUserId={user?.id ?? null}
+                initialMessages={initialMessages}
+                key={selectedUser?.id ?? "no-conversation"}
+                selectedUser={selectedUser}
+              />
+            ) : (
+              <MessageInbox
+                signedIn={Boolean(user)}
+                threads={unreadMessageThreads}
+                unreadCount={unreadMessageCount}
+              />
+            )}
           </section>
           <RightSidebar currentUserId={user?.id ?? null} />
         </div>

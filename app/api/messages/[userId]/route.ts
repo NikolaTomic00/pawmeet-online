@@ -3,7 +3,10 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { getConversationMessages } from "@/lib/social/messages";
+import {
+  getConversationMessages,
+  markConversationMessagesAsRead,
+} from "@/lib/social/messages";
 
 export async function GET(
   _request: Request,
@@ -24,6 +27,11 @@ export async function GET(
   }
 
   const { userId } = await params;
+  await markConversationMessagesAsRead({
+    currentUserId: currentUserProfile.id,
+    otherUserId: userId,
+  });
+
   const messages = await getConversationMessages({
     currentUserId: currentUserProfile.id,
     otherUserId: userId,

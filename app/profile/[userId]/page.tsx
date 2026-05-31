@@ -11,6 +11,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { syncUser } from "@/lib/auth/sync-user";
 import { getFollowStats } from "@/lib/social/follows";
+import { getUnreadMessageCount } from "@/lib/social/messages";
 import { getUnreadNotificationCount } from "@/lib/social/notifications";
 
 export default async function ProfilePage({
@@ -20,9 +21,10 @@ export default async function ProfilePage({
 }) {
   const { userId } = await params;
   const currentUser = await syncUser();
-  const [stats, unreadCount, profile] = await Promise.all([
+  const [stats, unreadCount, unreadMessageCount, profile] = await Promise.all([
     currentUser ? getFollowStats(currentUser.id) : null,
     getUnreadNotificationCount(currentUser?.id ?? null),
+    getUnreadMessageCount(currentUser?.id ?? null),
     db.query.users.findFirst({
       where: eq(users.id, userId),
     }),
@@ -52,6 +54,7 @@ export default async function ProfilePage({
         <MainNavbar
           currentUserId={currentUser?.id ?? null}
           unreadCount={unreadCount}
+          unreadMessageCount={unreadMessageCount}
         />
         <div className="mt-5 grid min-h-[calc(100vh-8rem)] w-full items-stretch gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
           <LeftSidebar user={currentUser} stats={stats} />

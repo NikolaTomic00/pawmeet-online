@@ -31,19 +31,26 @@ function getNavItems(currentUserId: string | null) {
 
 type MainNavbarProps = {
   currentUserId?: string | null;
+  unreadMessageCount?: number;
   unreadCount?: number;
 };
 
 export function MainNavbar({
   currentUserId = null,
+  unreadMessageCount = 0,
   unreadCount = 0,
 }: MainNavbarProps) {
   const hasUnreadNotifications = unreadCount > 0;
+  const hasUnreadMessages = unreadMessageCount > 0;
   const navItems = getNavItems(currentUserId);
 
   return (
     <>
-      <MobileNavbar currentUserId={currentUserId} unreadCount={unreadCount} />
+      <MobileNavbar
+        currentUserId={currentUserId}
+        unreadCount={unreadCount}
+        unreadMessageCount={unreadMessageCount}
+      />
 
       <nav className="hidden w-full flex-col gap-4 rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md sm:px-6 lg:flex lg:flex-row lg:items-center lg:justify-between">
         <Link className="flex items-center gap-3" href="/">
@@ -59,8 +66,10 @@ export function MainNavbar({
             const className =
               "flex items-center gap-2 rounded-lg border border-slate-700/70 bg-slate-900/60 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-cyan-400/70 hover:text-white";
             const isNotification = item.href === "/notifications";
+            const isMessages = item.href === "/messages";
             const iconClassName =
-              isNotification && hasUnreadNotifications
+              (isNotification && hasUnreadNotifications) ||
+              (isMessages && hasUnreadMessages)
                 ? "size-4 text-rose-400"
                 : "size-4 text-cyan-300";
 
@@ -72,6 +81,11 @@ export function MainNavbar({
                   {isNotification && hasUnreadNotifications ? (
                     <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-semibold text-rose-300">
                       {unreadCount} unread
+                    </span>
+                  ) : null}
+                  {isMessages && hasUnreadMessages ? (
+                    <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-semibold text-rose-300">
+                      {unreadMessageCount} unread
                     </span>
                   ) : null}
                 </Link>

@@ -124,6 +124,7 @@ export function ChatView({
         createdAt: new Date().toISOString(),
         id: `optimistic-${Date.now()}`,
         image: null,
+        read: false,
         receiverId: selectedUser.id,
         senderId: currentUserId,
         text: trimmedText,

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, inArray, ne, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { messages, users } from "@/db/schema";
@@ -19,9 +19,16 @@ export type ChatMessageSummary = {
   createdAt: string;
   id: string;
   image: string | null;
+  read: boolean;
   receiverId: string;
   senderId: string;
   text: string | null;
+};
+
+export type UnreadMessageThread = {
+  latestMessage: ChatMessageSummary;
+  sender: ChatUserSummary;
+  unreadCount: number;
 };
 
 function toChatUserSummary(user: typeof users.$inferSelect): ChatUserSummary {
@@ -43,6 +50,7 @@ function toChatMessageSummary(
     createdAt: message.createdAt.toISOString(),
     id: message.id,
     image: message.image,
+    read: message.read,
     receiverId: message.receiverId,
     senderId: message.senderId,
     text: message.text,
@@ -120,6 +128,73 @@ export async function getConversationMessages({
   });
 
   return conversationMessages.map(toChatMessageSummary);
+}
+
+export async function getUnreadMessageCount(userId: string | null) {
+  if (!userId) {
+    return 0;
+  }
+
+  const [result] = await db
+    .select({ value: count() })
+    .from(messages)
+    .where(and(eq(messages.receiverId, userId), eq(messages.read, false)));
+
+  return result?.value ?? 0;
+}
+
+export async function getUnreadMessageThreads(userId: string | null) {
+  if (!userId) {
+    return [];
+  }
+
+  const unreadMessages = await db.query.messages.findMany({
+    orderBy: desc(messages.createdAt),
+    where: and(eq(messages.receiverId, userId), eq(messages.read, false)),
+    with: {
+      sender: true,
+    },
+  });
+  const threadBySenderId = new Map<string, UnreadMessageThread>();
+
+  unreadMessages.forEach((message) => {
+    const existingThread = threadBySenderId.get(message.senderId);
+
+    if (existingThread) {
+      existingThread.unreadCount += 1;
+      return;
+    }
+
+    threadBySenderId.set(message.senderId, {
+      latestMessage: toChatMessageSummary(message),
+      sender: toChatUserSummary(message.sender),
+      unreadCount: 1,
+    });
+  });
+
+  return Array.from(threadBySenderId.values());
+}
+
+export async function markConversationMessagesAsRead({
+  currentUserId,
+  otherUserId,
+}: {
+  currentUserId: string;
+  otherUserId: string;
+}) {
+  const updatedMessages = await db
+    .update(messages)
+    .set({ read: true })
+    .where(
+      and(
+        eq(messages.senderId, otherUserId),
+        eq(messages.receiverId, currentUserId),
+        eq(messages.read, false),
+      ),
+    )
+    .returning({ id: messages.id });
+
+  return updatedMessages.length;
 }
 
 export async function createMessage({

@@ -54,17 +54,20 @@ const mobileLinkClass =
 
 type MobileNavbarProps = {
   currentUserId?: string | null;
+  unreadMessageCount?: number;
   unreadCount?: number;
 };
 
 export function MobileNavbar({
   currentUserId = null,
+  unreadMessageCount = 0,
   unreadCount = 0,
 }: MobileNavbarProps) {
   const { openUserProfile, signOut } = useClerk();
   const [isOpen, setIsOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const hasUnreadNotifications = unreadCount > 0;
+  const hasUnreadMessages = unreadMessageCount > 0;
   const mobileNavItems = getMobileNavItems(currentUserId);
 
   function handleManageSettings() {
@@ -120,8 +123,10 @@ export function MobileNavbar({
             {mobileNavItems.map((item) => {
               const Icon = item.icon;
               const isNotification = item.href === "/notifications";
+              const isMessages = item.href === "/messages";
               const iconClassName =
-                isNotification && hasUnreadNotifications
+                (isNotification && hasUnreadNotifications) ||
+                (isMessages && hasUnreadMessages)
                   ? "size-5 text-rose-400"
                   : "size-5 text-cyan-300";
 
@@ -134,6 +139,11 @@ export function MobileNavbar({
                       {isNotification && hasUnreadNotifications ? (
                         <span className="ml-auto rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-semibold text-rose-300">
                           {unreadCount} unread
+                        </span>
+                      ) : null}
+                      {isMessages && hasUnreadMessages ? (
+                        <span className="ml-auto rounded-full bg-rose-500/15 px-2 py-0.5 text-xs font-semibold text-rose-300">
+                          {unreadMessageCount} unread
                         </span>
                       ) : null}
                     </Link>
