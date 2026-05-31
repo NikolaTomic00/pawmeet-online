@@ -3,6 +3,7 @@ import {
   boolean,
   check,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -37,6 +38,30 @@ export const users = pgTable(
   (table) => [
     index("users_clerk_id_idx").on(table.clerkId),
     index("users_username_idx").on(table.username),
+  ],
+);
+
+export const profilePhotos = pgTable(
+  "profile_photos",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    image: text("image").notNull(),
+    publicId: text("public_id"),
+    width: integer("width"),
+    height: integer("height"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("profile_photos_user_id_idx").on(table.userId),
+    index("profile_photos_user_id_created_at_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
   ],
 );
 
@@ -203,6 +228,14 @@ export const usersRelations = relations(users, ({ many }) => ({
   sentMessages: many(messages, {
     relationName: "messageSender",
   }),
+  profilePhotos: many(profilePhotos),
+}));
+
+export const profilePhotosRelations = relations(profilePhotos, ({ one }) => ({
+  user: one(users, {
+    fields: [profilePhotos.userId],
+    references: [users.id],
+  }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -282,6 +315,8 @@ export const messagesRelations = relations(messages, ({ one }) => ({
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type ProfilePhoto = typeof profilePhotos.$inferSelect;
+export type NewProfilePhoto = typeof profilePhotos.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
 export type Comment = typeof comments.$inferSelect;

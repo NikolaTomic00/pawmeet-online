@@ -37,6 +37,7 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
+  const purpose = formData.get("purpose") === "profile" ? "profile" : "feed";
 
   if (!(file instanceof File)) {
     return jsonError("Choose an image to upload.");
@@ -52,8 +53,8 @@ export async function POST(request: Request) {
 
   const timestamp = Math.round(Date.now() / 1000);
   const uploadParams = {
-    folder: "pawmeet/feed",
-    tags: "pawmeet,feed",
+    folder: `pawmeet/${purpose}`,
+    tags: `pawmeet,${purpose}`,
     timestamp,
   };
   const signature = createCloudinarySignature(

@@ -9,6 +9,10 @@ export type CloudinaryUploadResult = {
   width?: number;
 };
 
+type CloudinaryDestroyResult = {
+  result?: string;
+};
+
 export function getCloudinaryConfig() {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
@@ -38,4 +42,37 @@ export function createCloudinarySignature(
   return createHash("sha1")
     .update(`${payload}${apiSecret}`)
     .digest("hex");
+}
+
+export async function destroyCloudinaryImage(publicId: string) {
+  const cloudinaryConfig = getCloudinaryConfig();
+  const timestamp = Math.round(Date.now() / 1000);
+  const destroyParams = {
+    public_id: publicId,
+    timestamp,
+  };
+  const signature = createCloudinarySignature(
+    destroyParams,
+    cloudinaryConfig.apiSecret,
+  );
+  const formData = new FormData();
+
+  formData.append("api_key", cloudinaryConfig.apiKey);
+  formData.append("public_id", publicId);
+  formData.append("signature", signature);
+  formData.append("timestamp", String(timestamp));
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/destroy`,
+    {
+      body: formData,
+      method: "POST",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Cloudinary image deletion failed.");
+  }
+
+  return (await response.json()) as CloudinaryDestroyResult;
 }

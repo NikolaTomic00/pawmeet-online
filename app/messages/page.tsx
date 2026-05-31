@@ -19,6 +19,7 @@ import {
   markConversationMessagesAsRead,
 } from "@/lib/social/messages";
 import { getUnreadNotificationCount } from "@/lib/social/notifications";
+import { getProfilePhotos } from "@/lib/social/profile-photos";
 
 export default async function MessagesPage({
   searchParams,
@@ -27,12 +28,13 @@ export default async function MessagesPage({
 }) {
   const { userId } = await searchParams;
   const user = await syncUser();
-  const [stats, unreadCount] = user
+  const [stats, unreadCount, profilePhotos] = user
     ? await Promise.all([
         getFollowStats(user.id),
         getUnreadNotificationCount(user.id),
+        getProfilePhotos(user.id),
       ])
-    : [null, 0];
+    : [null, 0, []];
   const selectedUser =
     user && userId && userId !== user.id ? await getChatUserById(userId) : null;
   const selectedUserStillExists = selectedUser
@@ -84,7 +86,7 @@ export default async function MessagesPage({
           unreadMessageCount={unreadMessageCount}
         />
         <div className="mt-5 grid min-h-[calc(100vh-8rem)] w-full items-stretch gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
-          <LeftSidebar user={user} stats={stats} />
+          <LeftSidebar photos={profilePhotos} user={user} stats={stats} />
           <section className="min-w-0">
             {selectedUserStillExists ? (
               <ChatView

@@ -1,5 +1,5 @@
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
-import { MapPin } from "lucide-react";
+import { Images, MapPin } from "lucide-react";
 import Image from "next/image";
 
 import { DogNameLine } from "@/components/profile/dog-name-line";
@@ -12,9 +12,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import type { User } from "@/db/schema";
+import type { ProfilePhoto, User } from "@/db/schema";
 
 type LeftSidebarProps = {
+  photos: ProfilePhoto[];
   user: User | null;
   stats: {
     followers: number;
@@ -50,7 +51,40 @@ function ProfileDetail({
   );
 }
 
-export function LeftSidebar({ user, stats }: LeftSidebarProps) {
+function SidebarPhotoGrid({ photos }: { photos: ProfilePhoto[] }) {
+  if (!photos.length) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+        <Images className="size-3.5 text-cyan-300" />
+        Photos
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {photos.slice(0, 9).map((photo) => (
+          <a
+            className="flex aspect-square items-center justify-center overflow-hidden rounded-md border border-slate-700/70 bg-slate-950/50 transition-colors hover:border-cyan-400/70"
+            href={photo.image}
+            key={photo.id}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo.image}
+              alt=""
+              className="max-h-full max-w-full object-contain"
+            />
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function LeftSidebar({ photos, user, stats }: LeftSidebarProps) {
   if (!user) {
     return (
       <aside className="hidden h-full lg:block">
@@ -139,6 +173,8 @@ export function LeftSidebar({ user, stats }: LeftSidebarProps) {
               <p className="text-xs text-slate-400">Following</p>
             </div>
           </div>
+
+          <SidebarPhotoGrid photos={photos} />
 
           <Separator />
 

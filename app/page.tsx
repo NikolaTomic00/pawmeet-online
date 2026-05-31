@@ -8,16 +8,18 @@ import { syncUser } from "@/lib/auth/sync-user";
 import { getFollowStats } from "@/lib/social/follows";
 import { getUnreadMessageCount } from "@/lib/social/messages";
 import { getUnreadNotificationCount } from "@/lib/social/notifications";
+import { getProfilePhotos } from "@/lib/social/profile-photos";
 
 export default async function Home() {
   const user = await syncUser();
-  const [stats, unreadCount, unreadMessageCount] = user
+  const [stats, unreadCount, unreadMessageCount, profilePhotos] = user
     ? await Promise.all([
         getFollowStats(user.id),
         getUnreadNotificationCount(user.id),
         getUnreadMessageCount(user.id),
+        getProfilePhotos(user.id),
       ])
-    : [null, 0, 0];
+    : [null, 0, 0, []];
 
   return (
     <PawMeetShell>
@@ -40,7 +42,7 @@ export default async function Home() {
           unreadMessageCount={unreadMessageCount}
         />
         <div className="mt-5 grid min-h-[calc(100vh-8rem)] w-full items-stretch gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
-          <LeftSidebar user={user} stats={stats} />
+          <LeftSidebar photos={profilePhotos} user={user} stats={stats} />
           <FeedPlaceholder user={user} />
           <RightSidebar currentUserId={user?.id ?? null} />
         </div>
