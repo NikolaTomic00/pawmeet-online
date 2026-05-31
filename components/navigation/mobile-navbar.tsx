@@ -6,6 +6,7 @@ import {
   Home,
   LogOut,
   Menu,
+  MessageCircle,
   PawPrint,
   Settings,
   UserRound,
@@ -34,6 +35,11 @@ function getMobileNavItems(currentUserId: string | null) {
     label: "Notification",
     icon: Bell,
     href: "/notifications",
+  },
+  {
+    label: "Messages",
+    icon: MessageCircle,
+    href: "/messages",
   },
   {
     label: "Profile",

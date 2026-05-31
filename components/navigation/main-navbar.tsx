@@ -1,5 +1,5 @@
 import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
-import { Bell, Home, PawPrint, UserRound } from "lucide-react";
+import { Bell, Home, MessageCircle, PawPrint, UserRound } from "lucide-react";
 import Link from "next/link";
 
 import { MobileNavbar } from "./mobile-navbar";
@@ -15,6 +15,11 @@ function getNavItems(currentUserId: string | null) {
     label: "Notification",
     icon: Bell,
     href: "/notifications",
+  },
+  {
+    label: "Messages",
+    icon: MessageCircle,
+    href: "/messages",
   },
   {
     label: "Profile",

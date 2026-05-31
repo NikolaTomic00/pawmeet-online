@@ -151,6 +151,38 @@ export const notifications = pgTable(
   ],
 );
 
+export const messages = pgTable(
+  "messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    senderId: uuid("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    receiverId: uuid("receiver_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    text: text("text"),
+    image: text("image"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("messages_sender_id_idx").on(table.senderId),
+    index("messages_receiver_id_idx").on(table.receiverId),
+    index("messages_pair_created_at_idx").on(
+      table.senderId,
+      table.receiverId,
+      table.createdAt,
+    ),
+    check("messages_no_self_message", sql`${table.senderId} <> ${table.receiverId}`),
+    check(
+      "messages_text_or_image_required",
+      sql`${table.text} IS NOT NULL OR ${table.image} IS NOT NULL`,
+    ),
+  ],
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
   comments: many(comments),
@@ -162,6 +194,12 @@ export const usersRelations = relations(users, ({ many }) => ({
   }),
   receivedNotifications: many(notifications, {
     relationName: "notificationReceiver",
+  }),
+  receivedMessages: many(messages, {
+    relationName: "messageReceiver",
+  }),
+  sentMessages: many(messages, {
+    relationName: "messageSender",
   }),
 }));
 
@@ -227,6 +265,19 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
+export const messagesRelations = relations(messages, ({ one }) => ({
+  receiver: one(users, {
+    fields: [messages.receiverId],
+    references: [users.id],
+    relationName: "messageReceiver",
+  }),
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+    relationName: "messageSender",
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Post = typeof posts.$inferSelect;
@@ -239,3 +290,5 @@ export type Follow = typeof follows.$inferSelect;
 export type NewFollow = typeof follows.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
 export type NewNotification = typeof notifications.$inferInsert;
+export type Message = typeof messages.$inferSelect;
+export type NewMessage = typeof messages.$inferInsert;
