@@ -1,4 +1,5 @@
 import "server-only";
+import "server-only";
 
 import { and, asc, count, desc, eq, inArray, ne, or } from "drizzle-orm";
 
@@ -81,7 +82,9 @@ export async function getChatPartners(currentUserId: string | null) {
   const partnerIds = Array.from(
     new Set(
       userMessages.map((message) =>
-        message.senderId === currentUserId ? message.receiverId : message.senderId,
+        message.senderId === currentUserId
+          ? message.receiverId
+          : message.senderId,
       ),
     ),
   );
