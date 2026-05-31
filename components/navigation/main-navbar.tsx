@@ -6,26 +6,26 @@ import { MobileNavbar } from "./mobile-navbar";
 
 function getNavItems(currentUserId: string | null) {
   return [
-  {
-    label: "Feed",
-    icon: Home,
-    href: "/",
-  },
-  {
-    label: "Notification",
-    icon: Bell,
-    href: "/notifications",
-  },
-  {
-    label: "Messages",
-    icon: MessageCircle,
-    href: "/messages",
-  },
-  {
-    label: "Profile",
-    icon: UserRound,
-    href: currentUserId ? `/profile/${currentUserId}` : "#",
-  },
+    {
+      label: "Feed",
+      icon: Home,
+      href: "/",
+    },
+    {
+      label: "Notification",
+      icon: Bell,
+      href: "/notifications",
+    },
+    {
+      label: "Messages",
+      icon: MessageCircle,
+      href: "/messages",
+    },
+    {
+      label: "Profile",
+      icon: UserRound,
+      href: currentUserId ? `/profile/${currentUserId}` : "#",
+    },
   ];
 }
 
@@ -35,6 +35,7 @@ type MainNavbarProps = {
   unreadCount?: number;
 };
 
+//protoction - if parent doenst pass value, this functions prevents program from crashing
 export function MainNavbar({
   currentUserId = null,
   unreadMessageCount = 0,

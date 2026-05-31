@@ -1,36 +1,190 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PawMeet Social App
+
+PawMeet is a full-stack social networking application built for pet owners and animal lovers. The app gives users a focused place to create a profile, share posts with images, interact through likes and comments, follow other users, receive notifications, and exchange direct messages.
+
+I built this project to practice and demonstrate production-oriented full-stack development with modern React, Next.js App Router, authentication, relational data modeling, server actions, media uploads, and responsive UI design.
+
+## Tech Stack
+
+![Next.js](https://img.shields.io/badge/Next.js-16.2.6-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=111827)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Clerk](https://img.shields.io/badge/Clerk-Auth-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)
+![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.44.7-C5F74F?style=for-the-badge&logo=drizzle&logoColor=111827)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-Media_Uploads-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
+
+## What I Built
+
+- A responsive social feed where users can create text and image posts.
+- Authenticated user accounts with Clerk and database profile synchronization.
+- User profiles with editable bio, location, pet name, breed, avatar, and profile photo gallery.
+- Social interactions including likes, comments, follows, and post deletion.
+- Notification system for likes, comments, and follows.
+- Direct messaging experience with chat contacts, unread message counts, and conversation read state.
+- Secure image upload flow through a server-side Cloudinary signing route.
+- Relational PostgreSQL schema with Drizzle ORM, indexes, unique constraints, cascade deletes, and data integrity checks.
+- Responsive layout with desktop sidebars, mobile navigation, dark UI styling, and a custom PawMeet favicon.
+
+## How I Built It
+
+The application uses the Next.js App Router as the main architecture. Server components load authenticated user data, feed posts, profile data, notifications, and chat state before rendering each route. Client components are used where interaction is needed, such as creating posts, uploading images, liking posts, writing comments, editing profiles, following users, and sending messages.
+
+Authentication is handled with Clerk. After sign-in, the app synchronizes the Clerk user into the local database so the rest of the social features can rely on an internal user model. This makes it possible to connect posts, comments, likes, follows, messages, notifications, and profile photos through relational foreign keys.
+
+Database access is implemented with Drizzle ORM on top of PostgreSQL. The schema includes users, posts, profile photos, comments, likes, follows, notifications, and messages. I added indexes for common lookup patterns such as feed loading, unread counts, user relationships, and message threads. The schema also includes unique constraints to prevent duplicate likes or follows, plus checks that prevent self-following and self-messaging.
+
+Media uploads are routed through a protected Next.js API endpoint. The server creates a Cloudinary signature, uploads the image, stores the returned URL and metadata, and associates the image with either a feed post or a profile photo.
+
+## Core Features
+
+### Feed
+
+Users can publish posts with text, images, or both. Feed posts include author details, profile links, timestamps, image rendering, like counts, comments, and delete controls for the post owner.
+
+### Profiles
+
+Each user has a profile page with editable personal and pet information. Users can upload multiple profile photos, delete their own profile photos, and display their profile gallery in both the profile page and sidebar.
+
+### Social Graph
+
+Users can follow and unfollow other users. Follow relationships are stored with a unique database constraint to prevent duplicates and are used to power profile stats and sidebar suggestions.
+
+### Notifications
+
+The app creates notifications when users like posts, comment on posts, or follow another user. Notification counts are surfaced in the navigation and marked as read when the notifications page is visited.
+
+### Messaging
+
+Users can open conversations with other profiles, send direct messages, load message history, and see unread message counts. Message records support text and image-ready structure, with database checks ensuring that a message contains content.
+
+## Project Structure
+
+```txt
+app/
+  page.tsx                         Main feed route
+  profile/[userId]/page.tsx        Public/editable profile route
+  messages/page.tsx                Direct messaging route
+  notifications/page.tsx           Notifications route
+  api/uploads/cloudinary/route.ts  Signed media upload endpoint
+  api/messages/[userId]/route.ts   Conversation fetch endpoint
+
+components/
+  feed/                            Post composer, post cards, likes, comments
+  profile/                         Profile editor and profile display helpers
+  sidebar/                         Left/right desktop sidebars and follow button
+  chat/                            Inbox, chat tabs, conversation UI
+  notifications/                   Notification list UI
+  navigation/                      Desktop and mobile navigation
+  ui/                              Reusable UI primitives
+
+db/
+  schema.ts                        Drizzle schema, relations, indexes, types
+
+lib/
+  auth/                            Clerk-to-database user sync
+  social/                          Server actions and database queries
+  cloudinary.ts                    Cloudinary signing and delete helpers
+```
+
+## Data Model
+
+The database is designed around a social product domain:
+
+- `users`: local application profile synchronized from Clerk.
+- `posts`: feed content with optional image attachment.
+- `profile_photos`: user gallery images with Cloudinary metadata.
+- `comments`: comments connected to posts and authors.
+- `likes`: unique user-to-post reactions.
+- `follows`: unique follower/following relationships.
+- `notifications`: like, comment, and follow events.
+- `messages`: direct user-to-user messages with read status.
+
+This structure keeps the app normalized and allows the UI to load related data efficiently through Drizzle relations.
+
+## Result
+
+The result is a working full-stack social app that demonstrates:
+
+- End-to-end feature development from database schema to UI.
+- Authenticated user flows with protected actions.
+- Relational data modeling for real social app behavior.
+- Server-side validation and cache revalidation after mutations.
+- Responsive, polished UI built around practical user workflows.
+- Media handling with secure server-side Cloudinary integration.
+
+This project is suitable as a portfolio/CV project because it goes beyond static UI. It includes authentication, persistent data, user-generated content, relational interactions, notifications, messaging, media uploads, and deployment-ready Next.js architecture.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js
+- npm
+- PostgreSQL database, for example Neon
+- Clerk application
+- Cloudinary account
+
+### Environment Variables
+
+Create a `.env.local` file and configure the required services:
+
+```env
+DATABASE_URL=
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+Depending on your Clerk setup, you may also need the standard Clerk route variables for sign-in and sign-up URLs.
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Run Database Migrations
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+For development environments where you want to push the schema directly:
+
+```bash
+npm run db:push
+```
+
+### Start Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev       # Start the local development server
+npm run build     # Create a production build
+npm run start     # Start the production server
+npm run lint      # Run ESLint
+npm run db:studio # Open Drizzle Studio
+```
 
-## Learn More
+## Quality Checks
 
-To learn more about Next.js, take a look at the following resources:
+The project was verified with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```
