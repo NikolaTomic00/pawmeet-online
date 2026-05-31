@@ -83,12 +83,12 @@ export function PostCard({
         ) : null}
 
         {post.image ? (
-          <div className="overflow-hidden rounded-lg border border-slate-700/70 bg-slate-900/50">
+          <div className="flex justify-center overflow-hidden rounded-lg border border-slate-700/70 bg-slate-950/60">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={post.image}
               alt=""
-              className="max-h-[520px] w-full object-cover"
+              className="h-auto max-h-[720px] max-w-full object-contain"
             />
           </div>
         ) : null}
