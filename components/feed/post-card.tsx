@@ -83,12 +83,12 @@ export function PostCard({
         ) : null}
 
         {post.image ? (
-          <div className="flex justify-center overflow-hidden rounded-lg border border-slate-700/70 bg-slate-950/60">
+          <div className="flex justify-center overflow-hidden rounded-lg border border-slate-700/70 bg-slate-950/60 lg:mx-auto lg:w-fit lg:max-w-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={post.image}
               alt=""
-              className="h-auto max-h-[720px] max-w-full object-contain lg:max-h-[460px] lg:max-w-[82%]"
+              className="h-auto max-h-[620px] max-w-full object-contain lg:max-h-[460px]"
             />
           </div>
         ) : null}
