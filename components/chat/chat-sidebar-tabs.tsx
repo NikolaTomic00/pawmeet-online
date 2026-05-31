@@ -4,6 +4,7 @@ import { MessageCircle, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { FollowUserButton } from "@/components/sidebar/follow-user-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,6 +40,7 @@ function UserCard({
   user: ChatUserSummary;
 }) {
   const isAlreadyFollowing = followedUserIds.includes(user.id);
+  const isSignedIn = Boolean(currentUserId);
 
   return (
     <div className="space-y-3 rounded-lg border border-slate-700/60 bg-slate-900/30 p-3">
@@ -61,13 +63,24 @@ function UserCard({
       </div>
 
       <div className="grid gap-2">
-        <Link
-          className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 px-3 text-xs font-semibold text-white shadow-lg shadow-cyan-950/30 transition-colors hover:bg-cyan-400"
-          href={`/messages?userId=${user.id}`}
-        >
-          <MessageCircle className="size-4" />
-          Send message
-        </Link>
+        {isSignedIn ? (
+          <Link
+            className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 px-3 text-xs font-semibold text-white shadow-lg shadow-cyan-950/30 transition-colors hover:bg-cyan-400"
+            href={`/messages?userId=${user.id}`}
+          >
+            <MessageCircle className="size-4" />
+            Send message
+          </Link>
+        ) : (
+          <button
+            className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 px-3 text-xs font-semibold text-white shadow-lg shadow-cyan-950/30 transition-colors hover:bg-cyan-400"
+            onClick={() => toast.error("Sign in to send messages.")}
+            type="button"
+          >
+            <MessageCircle className="size-4" />
+            Send message
+          </button>
+        )}
 
         <Link
           className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-slate-700/70 bg-slate-950/50 px-3 text-xs font-medium text-slate-300 transition-colors hover:border-cyan-400/70 hover:text-white"
@@ -80,7 +93,7 @@ function UserCard({
         {showFollow && !isAlreadyFollowing ? (
           <FollowUserButton
             initialFollowing={false}
-            isSignedIn={Boolean(currentUserId)}
+            isSignedIn={isSignedIn}
             userId={user.id}
           />
         ) : null}

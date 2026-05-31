@@ -25,7 +25,7 @@ export async function RightSidebar({ currentUserId }: RightSidebarProps) {
   ]);
 
   return (
-    <aside className="order-first h-full lg:hidden xl:order-none xl:block">
+    <aside className="h-full lg:hidden xl:block">
       <Card className="xl:sticky xl:top-4 xl:min-h-[calc(100vh-8rem)]">
         <CardHeader>
           <CardTitle className="text-lg">PawMeet chat</CardTitle>

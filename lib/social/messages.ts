@@ -58,13 +58,9 @@ function toChatMessageSummary(
 }
 
 export async function getChatContacts(currentUserId: string | null) {
-  if (!currentUserId) {
-    return [];
-  }
-
   const contacts = await db.query.users.findMany({
     orderBy: asc(users.name),
-    where: ne(users.id, currentUserId),
+    where: currentUserId ? ne(users.id, currentUserId) : undefined,
   });
 
   return contacts.map(toChatUserSummary);
