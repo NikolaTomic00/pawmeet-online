@@ -88,6 +88,41 @@ function ProfileDetail({
   );
 }
 
+function mergeProfilePhotos({
+  deletedPhotoIds,
+  localPhotos,
+  serverPhotos,
+}: {
+  deletedPhotoIds: string[];
+  localPhotos: ProfilePhoto[];
+  serverPhotos: ProfilePhoto[];
+}) {
+  const deletedIds = new Set(deletedPhotoIds);
+  const seenKeys = new Set<string>();
+  const mergedPhotos: ProfilePhoto[] = [];
+
+  for (const photo of [...localPhotos, ...serverPhotos]) {
+    if (deletedIds.has(photo.id)) {
+      continue;
+    }
+
+    const keys = [
+      `id:${photo.id}`,
+      photo.publicId ? `public:${photo.publicId}` : null,
+      `image:${photo.image}`,
+    ].filter(Boolean) as string[];
+
+    if (keys.some((key) => seenKeys.has(key))) {
+      continue;
+    }
+
+    keys.forEach((key) => seenKeys.add(key));
+    mergedPhotos.push(photo);
+  }
+
+  return mergedPhotos;
+}
+
 function ProfilePhotoGrid({
   canDelete = false,
   emptyText,
@@ -229,12 +264,11 @@ export function ProfileEditor({
   const [deletedPhotoIds, setDeletedPhotoIds] = useState<string[]>([]);
   const [isPhotoUploading, setIsPhotoUploading] = useState(false);
   const [isSaving, startSaving] = useTransition();
-  const displayedPhotos =
-    uploadedPhotos.profileId === profile.id
-      ? [...uploadedPhotos.photos, ...photos].filter(
-          (photo) => !deletedPhotoIds.includes(photo.id),
-        )
-      : photos.filter((photo) => !deletedPhotoIds.includes(photo.id));
+  const displayedPhotos = mergeProfilePhotos({
+    deletedPhotoIds,
+    localPhotos: uploadedPhotos.profileId === profile.id ? uploadedPhotos.photos : [],
+    serverPhotos: photos,
+  });
 
   function handleSave() {
     startSaving(async () => {

@@ -88,7 +88,7 @@ export function PostCard({
             <img
               src={post.image}
               alt=""
-              className="h-auto max-h-[720px] max-w-full object-contain"
+              className="h-auto max-h-[720px] max-w-full object-contain lg:max-h-[460px] lg:max-w-[82%]"
             />
           </div>
         ) : null}

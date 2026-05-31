@@ -75,12 +75,12 @@ function PostPreview({
       ) : null}
 
       {notification.post.image ? (
-        <div className="mt-3 overflow-hidden rounded-lg border border-slate-700/70 bg-slate-950/60">
+        <div className="mt-3 flex aspect-[4/5] max-w-48 items-center justify-center overflow-hidden rounded-lg border border-slate-700/70 bg-slate-950/60 sm:max-w-56">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={notification.post.image}
             alt=""
-            className="max-h-48 w-full object-cover"
+            className="max-h-full max-w-full object-contain"
           />
         </div>
       ) : null}
