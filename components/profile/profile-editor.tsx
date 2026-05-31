@@ -159,7 +159,7 @@ function ProfilePhotoGrid({
             <img
               src={photo.image}
               alt=""
-              className="max-h-full max-w-full object-contain transition-transform group-hover:scale-[1.03]"
+              className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]"
             />
           </a>
 
